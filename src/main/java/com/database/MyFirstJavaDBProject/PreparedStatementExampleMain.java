@@ -2,11 +2,12 @@ package com.database.MyFirstJavaDBProject;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
-public class DBMain {
+
+public class PreparedStatementExampleMain {
 
 	public static void main(String[] args) {
 		try {
@@ -26,9 +27,9 @@ public class DBMain {
 					"jdbc:mysql://127.0.0.1:7777/StudentDB", "root", "root");
 			System.out.println("Connection Eshtablished successfully........");
 
-			Statement statement = connection.createStatement();
+			PreparedStatement preparedStatement = connection.prepareStatement("Select * from Student");
 
-			ResultSet results = statement.executeQuery("Select * from Student");
+			ResultSet results = preparedStatement.executeQuery();
 
 			while (results.next()) {
 				System.out.println("Roll No: " + results.getString("RollNo")
@@ -36,22 +37,38 @@ public class DBMain {
 						+ ", Address: " + results.getString("address"));
 			}
 			
-			int numberOfRecordsUpdated = statement.executeUpdate("Insert into student values (4,'Akshit Kaushik' , 'Lexington')");
+			
+			int roll = 5;
+			String name = "Vyan Kaushik";
+			String address = "Cambridge";
+			
+			preparedStatement = connection.prepareStatement("Insert into student values (?,?,?)");
+			preparedStatement.setInt(0, roll);
+			preparedStatement.setString(1, name);
+			preparedStatement.setString(2, address);	
+		
+			
+			int numberOfRecordsUpdated = preparedStatement.executeUpdate();
 			if(numberOfRecordsUpdated == 1){
 				System.out.println("Record Successfully Inserted into database");
 			}else{
 				System.out.println("Unable to Insert record into database");
 			}
 			
-			numberOfRecordsUpdated = statement.executeUpdate("Update student set name='Akshit Kumar Kaushik' , address='Boston' where rollno=4");
+			preparedStatement = connection.prepareStatement("Update student set name=? , address=? where rollno=?");
+			preparedStatement.setInt(2, roll);
+			preparedStatement.setString(0, name);
+			preparedStatement.setString(1, address);	
+			numberOfRecordsUpdated = preparedStatement.executeUpdate();
 			if(numberOfRecordsUpdated == 1){
 				System.out.println("Record Successfully Updated in the database");
 			}else{
 				System.out.println("Unable to update record in the database");
 			}
 			
-			
-			numberOfRecordsUpdated = statement.executeUpdate("delete from student where rollno=4");
+			preparedStatement = connection.prepareStatement("delete from student where rollno=?");
+			preparedStatement.setInt(0, roll);
+			numberOfRecordsUpdated = preparedStatement.executeUpdate();
 			if(numberOfRecordsUpdated == 1){
 				System.out.println("Record Successfully deleted from the database");
 			}else{
